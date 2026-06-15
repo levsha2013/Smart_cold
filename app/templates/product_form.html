@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Добавить продукт{% endblock %}
+{% block content %}
+<div class="page-head"><h1>Новый продукт</h1></div>
+
+<form method="post" action="/products" class="card form">
+  <label>Название
+    <input type="text" name="name" id="name" required autofocus>
+  </label>
+
+  <div class="row">
+    <label>Количество
+      <input type="number" name="quantity" value="1" min="0" step="0.1">
+    </label>
+    <label>Единица
+      <select name="unit">
+        {% for u in units %}<option value="{{ u.value }}">{{ u.value }}</option>{% endfor %}
+      </select>
+    </label>
+  </div>
+
+  <div class="row">
+    <label>Категория
+      <select name="category_id" id="category">
+        <option value="">—</option>
+        {% for c in categories %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>Место хранения
+      <select name="location_id">
+        <option value="">—</option>
+        {% for l in locations %}<option value="{{ l.id }}">{{ l.name }}</option>{% endfor %}
+      </select>
+    </label>
+  </div>
+
+  <div class="row">
+    <label>Дата изготовления
+      <input type="date" name="production_date" id="production_date">
+    </label>
+    <label>Срок годности (до)
+      <input type="date" name="expiry_date" id="expiry_date">
+      <small id="suggest-hint" class="muted"></small>
+    </label>
+  </div>
+
+  <label>Заметки
+    <textarea name="notes" rows="2"></textarea>
+  </label>
+
+  <div class="form-actions">
+    <button class="btn btn-primary" type="submit">Сохранить</button>
+    <a class="btn" href="/">Отмена</a>
+  </div>
+</form>
+
+<script>
+// Автоподсказка срока годности из словаря по названию/категории/дате изготовления.
+const nameEl = document.getElementById('name');
+const catEl = document.getElementById('category');
+const prodEl = document.getElementById('production_date');
+const expEl = document.getElementById('expiry_date');
+const hint = document.getElementById('suggest-hint');
+
+async function suggest() {
+  if (!nameEl.value.trim()) return;
+  const params = new URLSearchParams({ name: nameEl.value.trim() });
+  if (catEl.selectedIndex > 0) params.append('category', catEl.options[catEl.selectedIndex].text);
+  if (prodEl.value) params.append('production_date', prodEl.value);
+  try {
+    const r = await fetch('/api/suggest-expiry?' + params.toString());
+    const data = await r.json();
+    if (data.expiry_date) {
+      hint.textContent = 'Предложено по словарю: ' + data.expiry_date;
+      if (!expEl.value) expEl.value = data.expiry_date;
+    } else {
+      hint.textContent = '';
+    }
+  } catch (e) { /* тихо игнорируем */ }
+}
+nameEl.addEventListener('blur', suggest);
+prodEl.addEventListener('change', suggest);
+catEl.addEventListener('change', suggest);
+</script>
+{% endblock %}

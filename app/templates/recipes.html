@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Рецепты{% endblock %}
+{% block content %}
+<div class="page-head"><h1>Рецепты</h1></div>
+
+{% if not configured %}
+  <div class="card notice">
+    🚧 Подбор рецептов пока не подключён. Здесь появятся предложения блюд из того,
+    что есть в холодильнике (планируется через LLM).
+  </div>
+{% endif %}
+
+{% if suggestions %}
+<ul>
+  {% for s in suggestions %}
+    <li><strong>{{ s.title }}</strong><p>{{ s.instructions }}</p></li>
+  {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}

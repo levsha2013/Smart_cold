@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}История{% endblock %}
+{% block content %}
+<div class="page-head"><h1>История событий</h1></div>
+
+{% if not events %}
+  <p class="empty">Событий пока нет.</p>
+{% else %}
+<table class="grid">
+  <thead><tr><th>Дата</th><th>Действие</th><th>Продукт</th><th>Изменение</th></tr></thead>
+  <tbody>
+    {% for e in events %}
+      <tr>
+        <td>{{ e.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+        <td>{{ labels.get(e.action.value, e.action.value) }}</td>
+        <td>{{ e.product_name }}</td>
+        <td>{{ e.quantity_delta|round(2) }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+{% endblock %}

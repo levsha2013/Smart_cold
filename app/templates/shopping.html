@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Список покупок{% endblock %}
+{% block content %}
+<div class="page-head"><h1>Список покупок</h1></div>
+
+<form method="post" action="/shopping" class="inline add-line">
+  <input type="text" name="name" placeholder="Что купить?" required>
+  <button class="btn btn-primary">Добавить</button>
+</form>
+
+{% if not items %}
+  <p class="empty">Список пуст.</p>
+{% else %}
+<ul class="checklist">
+  {% for item in items %}
+    <li class="{{ 'done' if item.done else '' }}">
+      <form method="post" action="/shopping/{{ item.id }}/toggle" class="inline">
+        <button class="link-btn">{{ '☑' if item.done else '☐' }}</button>
+      </form>
+      <span class="name">{{ item.name }}{% if item.quantity %} — {{ item.quantity|round(2) }} {{ item.unit.value if item.unit else '' }}{% endif %}</span>
+      <form method="post" action="/shopping/{{ item.id }}/delete" class="inline">
+        <button class="link-btn danger">✕</button>
+      </form>
+    </li>
+  {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}

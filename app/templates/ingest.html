@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Добавить через фото/голос/текст{% endblock %}
+{% block content %}
+<div class="page-head"><h1>Быстрое добавление</h1></div>
+
+<div class="cards-3">
+  <form method="post" action="/ingest/text" class="card form">
+    <h3>📝 Текстом</h3>
+    <p class="muted">По строке на продукт, можно с количеством: «молоко 2 л».</p>
+    <textarea name="text" rows="5" placeholder="молоко 2 л&#10;яйца 10 шт&#10;хлеб" required></textarea>
+    <button class="btn btn-primary">Распознать</button>
+  </form>
+
+  <form method="post" action="/ingest/photo" enctype="multipart/form-data" class="card form">
+    <h3>📷 Фото покупок</h3>
+    <p class="muted">Загрузите фото — продукты распознает ИИ (нужен ключ OpenRouter).</p>
+    <input type="file" name="photo" accept="image/*" required>
+    <button class="btn btn-primary">Распознать</button>
+  </form>
+
+  <form method="post" action="/ingest/voice" enctype="multipart/form-data" class="card form">
+    <h3>🎤 Голос</h3>
+    <p class="muted">Загрузите аудио — расшифрует STT (нужен ключ Groq).</p>
+    <input type="file" name="audio" accept="audio/*" required>
+    <button class="btn btn-primary">Распознать</button>
+  </form>
+</div>
+{% endblock %}

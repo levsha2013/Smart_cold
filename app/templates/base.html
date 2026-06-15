@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Умный холодильник{% endblock %}</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a href="/" class="brand">🧊 Умный холодильник</a>
+    <nav>
+      <a href="/">Продукты</a>
+      <a href="/ingest">Добавить (фото/голос)</a>
+      <a href="/shopping">Покупки</a>
+      <a href="/history">История</a>
+      <a href="/recipes">Рецепты</a>
+    </nav>
+  </header>
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

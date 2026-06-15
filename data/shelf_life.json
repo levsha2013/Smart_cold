@@ -1,0 +1,21 @@
+[
+  {"name_pattern": "яйц",        "category": "Прочее",        "days": 30,  "basis": "production", "days_after_opening": null},
+  {"name_pattern": "молоко",     "category": "Молочное",      "days": 7,   "basis": "production", "days_after_opening": 3},
+  {"name_pattern": "кефир",      "category": "Молочное",      "days": 7,   "basis": "production", "days_after_opening": 3},
+  {"name_pattern": "сметана",    "category": "Молочное",      "days": 10,  "basis": "production", "days_after_opening": 5},
+  {"name_pattern": "творог",     "category": "Молочное",      "days": 5,   "basis": "production", "days_after_opening": 2},
+  {"name_pattern": "сыр",        "category": "Молочное",      "days": 30,  "basis": "production", "days_after_opening": 10},
+  {"name_pattern": "йогурт",     "category": "Молочное",      "days": 14,  "basis": "production", "days_after_opening": 2},
+  {"name_pattern": "масло",      "category": "Молочное",      "days": 30,  "basis": "production", "days_after_opening": 14},
+  {"name_pattern": "курица",     "category": "Мясо и рыба",   "days": 2,   "basis": "purchase",   "days_after_opening": null},
+  {"name_pattern": "фарш",       "category": "Мясо и рыба",   "days": 1,   "basis": "purchase",   "days_after_opening": null},
+  {"name_pattern": "мясо",       "category": "Мясо и рыба",   "days": 3,   "basis": "purchase",   "days_after_opening": null},
+  {"name_pattern": "рыба",       "category": "Мясо и рыба",   "days": 2,   "basis": "purchase",   "days_after_opening": null},
+  {"name_pattern": "колбаса",    "category": "Мясо и рыба",   "days": 14,  "basis": "production", "days_after_opening": 5},
+  {"name_pattern": "хлеб",       "category": "Бакалея",       "days": 4,   "basis": "production", "days_after_opening": null},
+  {"name_pattern": "помидор",    "category": "Овощи и фрукты", "days": 7,  "basis": "purchase",   "days_after_opening": null},
+  {"name_pattern": "огурец",     "category": "Овощи и фрукты", "days": 7,  "basis": "purchase",   "days_after_opening": null},
+  {"name_pattern": "яблок",      "category": "Овощи и фрукты", "days": 21, "basis": "purchase",   "days_after_opening": null},
+  {"name_pattern": "банан",      "category": "Овощи и фрукты", "days": 5,  "basis": "purchase",   "days_after_opening": null},
+  {"name_pattern": "сок",        "category": "Напитки",       "days": 30,  "basis": "production", "days_after_opening": 3}
+]

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Подтверждение{% endblock %}
+{% block content %}
+<div class="page-head"><h1>Проверьте распознанное</h1></div>
+
+{% if not result.configured %}
+  <div class="card notice">⚠️ {{ result.message }}</div>
+{% elif result.message %}
+  <div class="card notice">{{ result.message }}</div>
+{% endif %}
+
+{% if result.raw_text %}
+  <p class="muted">Распознанный текст: «{{ result.raw_text }}»</p>
+{% endif %}
+
+{% if result.products %}
+<form method="post" action="/ingest/confirm" class="card">
+  <table class="grid">
+    <thead><tr><th>Название</th><th>Кол-во</th><th>Ед.</th></tr></thead>
+    <tbody>
+      {% for p in result.products %}
+      <tr>
+        <td><input type="text" name="name" value="{{ p.name }}"></td>
+        <td><input type="number" name="quantity" value="{{ p.quantity }}" min="0" step="0.1" class="qty"></td>
+        <td>
+          <select name="unit">
+            {% for u in units %}
+              <option value="{{ u.value }}" {{ 'selected' if u == p.unit else '' }}>{{ u.value }}</option>
+            {% endfor %}
+          </select>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="form-actions">
+    <button class="btn btn-primary">Добавить всё</button>
+    <a class="btn" href="/ingest">Назад</a>
+  </div>
+</form>
+{% else %}
+  <p class="empty">Ничего не распознано. <a href="/ingest">Попробовать снова</a></p>
+{% endif %}
+{% endblock %}
