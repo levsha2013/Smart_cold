@@ -12,6 +12,12 @@ from app.config import settings
 
 logger = logging.getLogger(__name__)
 
+# Для SQLite — создать папку под файл БД, если её нет.
+if settings.database_url.startswith("sqlite"):
+    _db_path = settings.database_url.split("///")[-1].lstrip("/")
+    if _db_path and _db_path not in (":memory:", ""):
+        Path(_db_path).parent.mkdir(parents=True, exist_ok=True)
+
 # SQLite требует check_same_thread=False для работы в многопоточном FastAPI/APScheduler.
 _connect_args = {"check_same_thread": False} if settings.database_url.startswith("sqlite") else {}
 engine = create_engine(settings.database_url, connect_args=_connect_args, future=True)

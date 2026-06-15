@@ -1,8 +1,33 @@
+# Окружение
 .env
-__pycache__/
-*.pyc
-*.db
-.pytest_cache/
-data/*.db
 .venv/
 venv/
+env/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# БД
+*.db
+*.sqlite3
+data/*.db
+
+# Тесты / CI
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# ОС
+.DS_Store
+Thumbs.db
