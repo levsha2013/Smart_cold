@@ -47,16 +47,32 @@ async def ingest_confirm(request: Request, db: Session = Depends(get_db)):
     names = form.getlist("name")
     quantities = form.getlist("quantity")
     units = form.getlist("unit")
+    production_dates = form.getlist("production_date")
+    expiry_dates = form.getlist("expiry_date")
+    days_after = form.getlist("days_after_opening")
+    categories = form.getlist("category")
+
+    # карта "имя категории" -> id для маппинга распознанной категории
+    cat_by_name = {c.name.lower(): c.id for c in crud.list_categories(db)}
+
+    def at(lst, i):
+        return lst[i] if i < len(lst) else ""
+
     for i, name in enumerate(names):
         name = name.strip()
         if not name:
             continue
+        cat_name = at(categories, i).strip().lower()
         crud.add_product(
             db,
             ProductCreate(
                 name=name,
-                quantity=_to_float(quantities[i] if i < len(quantities) else "1"),
+                quantity=_to_float(at(quantities, i) or "1"),
                 unit=Unit(units[i]) if i < len(units) else Unit.pcs,
+                category_id=cat_by_name.get(cat_name),
+                production_date=_parse_date(at(production_dates, i)),
+                expiry_date=_parse_date(at(expiry_dates, i)),
+                days_after_opening=_to_int(at(days_after, i)),
                 source="ingest",
             ),
         )
@@ -75,3 +91,25 @@ def _to_float(value: str) -> float:
         return float(str(value).replace(",", "."))
     except (ValueError, TypeError):
         return 1.0
+
+
+def _to_int(value: str) -> int | None:
+    value = (value or "").strip()
+    if not value:
+        return None
+    try:
+        return int(float(value.replace(",", ".")))
+    except (ValueError, TypeError):
+        return None
+
+
+def _parse_date(value: str):
+    from datetime import date
+
+    value = (value or "").strip()
+    if not value:
+        return None
+    try:
+        return date.fromisoformat(value)
+    except ValueError:
+        return None

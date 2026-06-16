@@ -19,7 +19,10 @@ class Settings(BaseSettings):
     # OpenRouter (vision)
     openrouter_api_key: str = ""
     openrouter_base_url: str = "https://openrouter.ai/api/v1"
-    openrouter_vision_model: str = "qwen/qwen-2-vl-7b-instruct"
+    openrouter_vision_model: str = "google/gemma-4-31b-it:free"
+    # Текстовая модель для разбора транскрипта голоса в полную карточку (бесплатная по умолчанию).
+    # Та же мультимодальная модель отлично работает и с чистым текстом.
+    openrouter_text_model: str = "google/gemma-4-31b-it:free"
 
     # Groq (STT)
     groq_api_key: str = ""
@@ -32,6 +35,10 @@ class Settings(BaseSettings):
 
     @property
     def vision_enabled(self) -> bool:
+        return bool(self.openrouter_api_key)
+
+    @property
+    def openrouter_enabled(self) -> bool:
         return bool(self.openrouter_api_key)
 
     @property

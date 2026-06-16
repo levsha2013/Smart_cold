@@ -57,6 +57,7 @@ def add_product(db: Session, data: ProductCreate) -> Product:
         unit=data.unit,
         production_date=data.production_date,
         expiry_date=data.expiry_date,
+        days_after_opening=data.days_after_opening,
         notes=data.notes,
         source=data.source,
         added_date=date.today(),
@@ -64,6 +65,22 @@ def add_product(db: Session, data: ProductCreate) -> Product:
     db.add(product)
     db.flush()  # получаем product.id
     _log(db, product, Action.added, data.quantity)
+    db.commit()
+    db.refresh(product)
+    return product
+
+
+def update_product(db: Session, product: Product, data: ProductCreate) -> Product:
+    """Полная правка характеристик продукта (без записи в историю — это коррекция)."""
+    product.name = data.name
+    product.category_id = data.category_id
+    product.location_id = data.location_id
+    product.quantity = data.quantity
+    product.unit = data.unit
+    product.production_date = data.production_date
+    product.expiry_date = data.expiry_date
+    product.days_after_opening = data.days_after_opening
+    product.notes = data.notes
     db.commit()
     db.refresh(product)
     return product

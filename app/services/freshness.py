@@ -43,12 +43,10 @@ def effective_expiry(product: Product) -> date | None:
     expiry = product.expiry_date
     if expiry is None:
         return None
-    if product.opened_date and product.category:
-        # после вскрытия срок может сократиться (days_after_opening из словаря)
-        match = _lookup_default(product.name, product.category.name)
-        if match and match.days_after_opening is not None:
-            opened_limit = product.opened_date + timedelta(days=match.days_after_opening)
-            expiry = min(expiry, opened_limit)
+    if product.opened_date and product.days_after_opening is not None:
+        # после вскрытия срок сокращается на ручное поле days_after_opening продукта
+        opened_limit = product.opened_date + timedelta(days=product.days_after_opening)
+        expiry = min(expiry, opened_limit)
     return expiry
 
 

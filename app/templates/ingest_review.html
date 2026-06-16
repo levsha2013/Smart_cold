@@ -15,8 +15,14 @@
 
 {% if result.products %}
 <form method="post" action="/ingest/confirm" class="card">
+  <p class="muted">Проверьте и при необходимости поправьте поля перед сохранением.</p>
   <table class="grid">
-    <thead><tr><th>Название</th><th>Кол-во</th><th>Ед.</th></tr></thead>
+    <thead>
+      <tr>
+        <th>Название</th><th>Кол-во</th><th>Ед.</th>
+        <th>Изготовлен</th><th>Годен до</th><th>После вскрытия, дн.</th>
+      </tr>
+    </thead>
     <tbody>
       {% for p in result.products %}
       <tr>
@@ -29,6 +35,10 @@
             {% endfor %}
           </select>
         </td>
+        <td><input type="date" name="production_date" value="{{ p.production_date.isoformat() if p.production_date else '' }}"></td>
+        <td><input type="date" name="expiry_date" value="{{ p.expiry_date.isoformat() if p.expiry_date else '' }}"></td>
+        <td><input type="number" name="days_after_opening" value="{{ p.days_after_opening if p.days_after_opening is not none else '' }}" min="0" class="qty">
+          <input type="hidden" name="category" value="{{ p.category or '' }}"></td>
       </tr>
       {% endfor %}
     </tbody>

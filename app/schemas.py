@@ -16,6 +16,7 @@ class ParsedProduct(BaseModel):
     category: str | None = None
     production_date: date | None = None
     expiry_date: date | None = None
+    days_after_opening: int | None = None
     notes: str | None = None
 
 
@@ -27,6 +28,7 @@ class ProductCreate(BaseModel):
     location_id: int | None = None
     production_date: date | None = None
     expiry_date: date | None = None
+    days_after_opening: int | None = None
     notes: str | None = None
     source: str = "manual"
 

@@ -41,6 +41,7 @@ def init_db() -> None:
     from app import models  # импорт здесь, чтобы избежать циклов
 
     models.Base.metadata.create_all(bind=engine)
+    _ensure_columns()
     with SessionLocal() as db:
         _seed_categories(db)
         _seed_locations(db)
@@ -50,6 +51,24 @@ def init_db() -> None:
         from app.services import freshness
 
         freshness._load_defaults(db)
+
+
+def _ensure_columns() -> None:
+    """Лёгкая миграция для SQLite: добавляет недостающие столбцы в существующую БД.
+
+    create_all не изменяет уже созданные таблицы, поэтому новые поля добавляем вручную.
+    """
+    if not settings.database_url.startswith("sqlite"):
+        return
+    # столбцы, которые могли появиться после первоначального создания БД
+    expected = {"products": {"days_after_opening": "INTEGER"}}
+    with engine.begin() as conn:
+        for table, columns in expected.items():
+            existing = {row[1] for row in conn.exec_driver_sql(f"PRAGMA table_info({table})")}
+            for col, coltype in columns.items():
+                if col not in existing:
+                    conn.exec_driver_sql(f"ALTER TABLE {table} ADD COLUMN {col} {coltype}")
+                    logger.info("Миграция: добавлен столбец %s.%s", table, col)
 
 
 def _seed_categories(db: Session) -> None:

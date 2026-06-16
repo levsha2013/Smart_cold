@@ -1,9 +1,19 @@
 """Тесты слоя ингестии: текстовый парсер и graceful-заглушки vision/STT без ключей."""
 from __future__ import annotations
 
+import pytest
+
+from app.config import settings
 from app.models import Unit
 from app.services.ingestion import factory
 from app.services.ingestion.text import rule_parser
+
+
+@pytest.fixture()
+def no_keys(monkeypatch):
+    """Обнуляет API-ключи, чтобы проверить ветку заглушек независимо от .env пользователя."""
+    monkeypatch.setattr(settings, "openrouter_api_key", "")
+    monkeypatch.setattr(settings, "groq_api_key", "")
 
 
 def test_text_parser_quantity_and_unit():
@@ -29,14 +39,14 @@ def test_text_parser_comma_separated():
     assert len(result.products) == 2
 
 
-def test_vision_stub_without_key():
+def test_vision_stub_without_key(no_keys):
     # Без OPENROUTER_API_KEY провайдер — заглушка.
     result = factory.parse_image(b"fakebytes", "image/jpeg")
     assert result.configured is False
     assert "OPENROUTER" in (result.message or "")
 
 
-def test_stt_stub_without_key():
+def test_stt_stub_without_key(no_keys):
     result = factory.transcribe(b"fakeaudio", "voice.ogg")
     assert result.configured is False
     assert "GROQ" in (result.message or "")

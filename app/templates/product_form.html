@@ -1,20 +1,21 @@
 {% extends "base.html" %}
-{% block title %}Добавить продукт{% endblock %}
+{% set editing = product is not none %}
+{% block title %}{{ 'Редактировать продукт' if editing else 'Добавить продукт' }}{% endblock %}
 {% block content %}
-<div class="page-head"><h1>Новый продукт</h1></div>
+<div class="page-head"><h1>{{ 'Редактировать продукт' if editing else 'Новый продукт' }}</h1></div>
 
-<form method="post" action="/products" class="card form">
+<form method="post" action="{{ ('/products/' ~ product.id ~ '/edit') if editing else '/products' }}" class="card form">
   <label>Название
-    <input type="text" name="name" id="name" required autofocus>
+    <input type="text" name="name" id="name" required autofocus value="{{ product.name if editing else '' }}">
   </label>
 
   <div class="row">
     <label>Количество
-      <input type="number" name="quantity" value="1" min="0" step="0.1">
+      <input type="number" name="quantity" value="{{ product.quantity if editing else 1 }}" min="0" step="0.1">
     </label>
     <label>Единица
       <select name="unit">
-        {% for u in units %}<option value="{{ u.value }}">{{ u.value }}</option>{% endfor %}
+        {% for u in units %}<option value="{{ u.value }}" {{ 'selected' if editing and u == product.unit else '' }}>{{ u.value }}</option>{% endfor %}
       </select>
     </label>
   </div>
@@ -23,33 +24,41 @@
     <label>Категория
       <select name="category_id" id="category">
         <option value="">—</option>
-        {% for c in categories %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}
+        {% for c in categories %}<option value="{{ c.id }}" {{ 'selected' if editing and product.category_id == c.id else '' }}>{{ c.name }}</option>{% endfor %}
       </select>
     </label>
     <label>Место хранения
       <select name="location_id">
         <option value="">—</option>
-        {% for l in locations %}<option value="{{ l.id }}">{{ l.name }}</option>{% endfor %}
+        {% for l in locations %}<option value="{{ l.id }}" {{ 'selected' if editing and product.location_id == l.id else '' }}>{{ l.name }}</option>{% endfor %}
       </select>
     </label>
   </div>
 
   <div class="row">
     <label>Дата изготовления
-      <input type="date" name="production_date" id="production_date">
+      <input type="date" name="production_date" id="production_date" value="{{ product.production_date.isoformat() if editing and product.production_date else '' }}">
     </label>
     <label>Срок годности (до)
-      <input type="date" name="expiry_date" id="expiry_date">
+      <input type="date" name="expiry_date" id="expiry_date" value="{{ product.expiry_date.isoformat() if editing and product.expiry_date else '' }}">
       <small id="suggest-hint" class="muted"></small>
     </label>
   </div>
 
+  <div class="row">
+    <label>Хранить дней после вскрытия
+      <input type="number" name="days_after_opening" min="0" placeholder="напр. 3"
+             value="{{ product.days_after_opening if editing and product.days_after_opening is not none else '' }}">
+    </label>
+    <label>&nbsp;</label>
+  </div>
+
   <label>Заметки
-    <textarea name="notes" rows="2"></textarea>
+    <textarea name="notes" rows="2">{{ product.notes if editing and product.notes else '' }}</textarea>
   </label>
 
   <div class="form-actions">
-    <button class="btn btn-primary" type="submit">Сохранить</button>
+    <button class="btn btn-primary" type="submit">{{ 'Сохранить изменения' if editing else 'Сохранить' }}</button>
     <a class="btn" href="/">Отмена</a>
   </div>
 </form>

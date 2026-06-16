@@ -5,15 +5,18 @@
 from __future__ import annotations
 
 import base64
-import json
 import logging
+from datetime import date
 
 import httpx
-from pydantic import ValidationError
 
 from app.config import settings
-from app.schemas import ParsedProduct
-from app.services.ingestion.base import EXTRACTION_PROMPT, IngestResult, VisionProvider
+from app.services.ingestion.base import (
+    IngestResult,
+    VisionProvider,
+    build_prompt,
+    parse_llm_json,
+)
 
 logger = logging.getLogger(__name__)
 _TIMEOUT = 60.0
@@ -33,7 +36,7 @@ class OpenRouterVisionProvider(VisionProvider):
         payload = {
             "model": settings.openrouter_vision_model,
             "messages": [
-                {"role": "system", "content": EXTRACTION_PROMPT},
+                {"role": "system", "content": build_prompt(date.today())},
                 {
                     "role": "user",
                     "content": [
@@ -58,31 +61,8 @@ class OpenRouterVisionProvider(VisionProvider):
             logger.exception("OpenRouter vision request failed")
             return IngestResult(configured=True, message=f"Ошибка запроса к OpenRouter: {exc}")
 
-        products = _parse_llm_json(content)
+        products = parse_llm_json(content)
         return IngestResult(products=products, raw_text=content, configured=True)
-
-
-def _parse_llm_json(content: str) -> list[ParsedProduct]:
-    """Достаёт массив объектов из ответа LLM (учитывает обёртку в объект {"products": [...]})."""
-    try:
-        data = json.loads(content)
-    except json.JSONDecodeError:
-        logger.warning("Не удалось распарсить JSON от LLM: %s", content[:200])
-        return []
-    if isinstance(data, dict):
-        for key in ("products", "items", "data"):
-            if isinstance(data.get(key), list):
-                data = data[key]
-                break
-        else:
-            data = [data]
-    products: list[ParsedProduct] = []
-    for item in data if isinstance(data, list) else []:
-        try:
-            products.append(ParsedProduct.model_validate(item))
-        except ValidationError:
-            logger.warning("Пропущена невалидная позиция от LLM: %s", item)
-    return products
 
 
 def get_provider() -> VisionProvider:

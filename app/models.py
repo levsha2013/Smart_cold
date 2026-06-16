@@ -73,6 +73,8 @@ class Product(Base):
     production_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     expiry_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     opened_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    # Сколько дней хранить после вскрытия (ручное поле; срок сокращается с момента вскрытия).
+    days_after_opening: Mapped[int | None] = mapped_column(Integer, nullable=True)
     added_date: Mapped[date] = mapped_column(Date, default=date.today, nullable=False)
 
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)

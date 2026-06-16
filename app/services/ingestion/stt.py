@@ -10,6 +10,7 @@ import httpx
 
 from app.config import settings
 from app.services.ingestion.base import IngestResult, SttProvider
+from app.services.ingestion.llm import llm_text_parser
 from app.services.ingestion.text import rule_parser
 
 logger = logging.getLogger(__name__)
@@ -43,8 +44,12 @@ class GroqSttProvider(SttProvider):
             logger.exception("Groq STT request failed")
             return IngestResult(configured=True, message=f"Ошибка запроса к Groq: {exc}")
 
-        # Распознанный текст → тот же парсер, что и для ручного ввода текста.
-        parsed = rule_parser.parse(text)
+        # Транскрипт → полная карточка через LLM (если OpenRouter настроен),
+        # иначе — простой regex-парсер (только имя/кол-во/единица).
+        if settings.openrouter_enabled:
+            parsed = llm_text_parser.parse(text)
+        else:
+            parsed = rule_parser.parse(text)
         parsed.raw_text = text
         return parsed
 

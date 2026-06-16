@@ -10,6 +10,24 @@ def _add(db, name="Молоко", qty=2.0):
     return crud.add_product(db, ProductCreate(name=name, quantity=qty, unit=Unit.l))
 
 
+def test_add_product_with_days_after_opening(db):
+    p = crud.add_product(
+        db, ProductCreate(name="Сметана", quantity=1, unit=Unit.pcs, days_after_opening=5)
+    )
+    assert p.days_after_opening == 5
+
+
+def test_update_product_changes_fields(db):
+    p = _add(db, name="Молоко", qty=2.0)
+    crud.update_product(
+        db, p, ProductCreate(name="Кефир", quantity=1.5, unit=Unit.l, days_after_opening=3)
+    )
+    updated = crud.get_product(db, p.id)
+    assert updated.name == "Кефир"
+    assert updated.quantity == 1.5
+    assert updated.days_after_opening == 3
+
+
 def test_add_product_creates_history(db):
     p = _add(db)
     assert p.id is not None

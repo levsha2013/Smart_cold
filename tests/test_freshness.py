@@ -52,12 +52,20 @@ def test_suggest_expiry_none_for_unknown(db):
     assert freshness.suggest_expiry(db, "неведомый товар", None, date.today(), date.today()) is None
 
 
-def test_opened_shortens_expiry(db):
-    cat = db.query(Category).filter_by(name="Молочное").one()
-    # срок далеко, но вскрыто сегодня → молоко +3 дня после вскрытия
+def test_opened_shortens_expiry():
+    # срок далеко, но вскрыто сегодня и days_after_opening=3 → срок = сегодня + 3
     p = _product(
         name="молоко", expiry=date.today() + timedelta(days=30),
-        opened_date=date.today(), category=cat,
+        opened_date=date.today(), days_after_opening=3,
     )
     eff = freshness.effective_expiry(p)
     assert eff == date.today() + timedelta(days=3)
+
+
+def test_opened_without_field_keeps_expiry():
+    # вскрыто, но days_after_opening не задан → срок не меняется
+    p = _product(
+        name="молоко", expiry=date.today() + timedelta(days=30),
+        opened_date=date.today(),
+    )
+    assert freshness.effective_expiry(p) == date.today() + timedelta(days=30)
